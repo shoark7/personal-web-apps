@@ -1,0 +1,56 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+
+<div id="color-bar"></div>
+<form method="POST" action="">
+<svg id="note-sheet" class="alert alert-dark">
+  <foreignObject x="10" y="10" width="100" height="150">
+      <div xmlns="http://www.w3.org/1999/xhtml">
+      <input></input>
+          </div>
+  </foreignObject>
+</svg>
+</form>
+
+<script>
+var rect_count = 0
+var svg = d3.select('#note-sheet')
+let MOUSE = {startX: 0, startY: 0,
+						 endX: 0, endY: 0};
+
+svg.on("mousedown", function() {
+		MOUSE.startX = d3.mouse(this)[0];
+		MOUSE.startY = d3.mouse(this)[1];
+	})
+   .on("mouseup", function() {
+		MOUSE.endX = d3.mouse(this)[0];
+		MOUSE.endY = d3.mouse(this)[1];
+		draw();
+	})
+
+function draw() {
+	if(MOUSE.endX - MOUSE.startX < 50 || MOUSE.endY - MOUSE.startY < 30) {
+		return;
+	}
+
+	var post = svg.append('g');
+	post.append('rect')
+				.attr('x', MOUSE.startX)
+				.attr('y', MOUSE.startY)
+				.attr('width', MOUSE.endX - MOUSE.startX)
+				.attr('height', MOUSE.endY - MOUSE.startY)
+				.attr("fill", "steelblue")
+				.style('z-index', rect_count);
+	post.append('foreignObject')
+				.attr('x', MOUSE.startX)
+				.attr('y', MOUSE.startY)
+				.attr('width', MOUSE.endX - MOUSE.startX)
+				.attr('height', MOUSE.endY - MOUSE.startY)
+				.attr("fill", "steelblue")
+			.append('input')
+			
+	rect_count -= 1
+}
+</script>
+{% endblock %}
