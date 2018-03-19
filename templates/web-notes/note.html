@@ -4,28 +4,32 @@
 
 <div id="color-bar"></div>
 <form method="POST" action="">
-<svg id="note-sheet" class="alert alert-dark">
-  <foreignObject x="10" y="10" width="100" height="150">
-      <div xmlns="http://www.w3.org/1999/xhtml">
-      <input></input>
-          </div>
-  </foreignObject>
-</svg>
+{% csrf_token %}
+<!--<svg id="note-sheet" class="alert alert-dark">-->
+  <!--<foreignObject x="10" y="10" width="100" height="150">-->
+        <!--<input></input>-->
+  <!--</foreignObject>-->
+<!--</svg>-->
+  <div id="note-sheet">
+
+
+  </div>
 </form>
 
 <script>
 var rect_count = 0
-var svg = d3.select('#note-sheet')
+var noteSheet = d3.select('#note-sheet')
 let MOUSE = {startX: 0, startY: 0,
 						 endX: 0, endY: 0};
 
-svg.on("mousedown", function() {
-		MOUSE.startX = d3.mouse(this)[0];
+noteSheet
+  .on("mousedown", function() {
 		MOUSE.startY = d3.mouse(this)[1];
+		MOUSE.startX = d3.mouse(this)[0];
 	})
-   .on("mouseup", function() {
-		MOUSE.endX = d3.mouse(this)[0];
+  .on("mouseup", function() {
 		MOUSE.endY = d3.mouse(this)[1];
+		MOUSE.endX = d3.mouse(this)[0];
 		draw();
 	})
 
@@ -34,23 +38,15 @@ function draw() {
 		return;
 	}
 
-	var post = svg.append('g');
-	post.append('rect')
-				.attr('x', MOUSE.startX)
-				.attr('y', MOUSE.startY)
-				.attr('width', MOUSE.endX - MOUSE.startX)
-				.attr('height', MOUSE.endY - MOUSE.startY)
-				.attr("fill", "steelblue")
-				.style('z-index', rect_count);
-	post.append('foreignObject')
-				.attr('x', MOUSE.startX)
-				.attr('y', MOUSE.startY)
-				.attr('width', MOUSE.endX - MOUSE.startX)
-				.attr('height', MOUSE.endY - MOUSE.startY)
-				.attr("fill", "steelblue")
-			.append('input')
-			
-	rect_count -= 1
+  var width = MOUSE.endX - MOUSE.startX;
+  var height = MOUSE.endY - MOUSE.startY;
+  console.log('width, height: ',width, height);
+  noteSheet.append('textarea')
+        .attr('class', 'note')
+        .style('left', MOUSE.startX+'px')
+        .style('top', MOUSE.startY+'px')
+        .style('width', width+'px')
+        .style('height', height+'px')
 }
 </script>
 {% endblock %}

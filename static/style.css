@@ -1,16 +1,13 @@
 #note-sheet {
-	color: red;
-	margin: 1em auto;
-	width: 90vw;
-	height: 90vh;
-	display: block;
+  border: 1px solid black;
+  width: 90%;
+  height: 600px;
+  margin: 20px auto;
+  background-color: #bbb;
+  position: relative;
 }
 
-#note-sheet rect {
-	position: relative;
-	/*z-index: 5;*/
-}
-
-#note-sheet rect:active {
-	z-index: -1;
+textarea {
+    position: absolute;
+    background-color: red;
 }
