@@ -1,15 +1,19 @@
-#note-sheet {
-  border: 1px solid black;
+#note-wrapper {
   width: 90%;
-  height: 600px;
   margin: 20px auto;
+}
+
+#note-sheet {
+  height: 600px;
+	width: 100%;
+  border: 1px solid black;
   background-color: #bbb;
   position: relative;
 }
 
 textarea.note {
     position: absolute;
-    background-color: white;
+    /*background-color: rgb(255,255,165);*/
 }
 
 textarea:active {
@@ -17,7 +21,7 @@ textarea:active {
 }
 
 .postCloser {
-	background-color: grey;
+	background-color: rgb(225,225,135);
 	position: absolute;
 }
 

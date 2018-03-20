@@ -5,14 +5,19 @@
 
 {% block content %}
 
-<div id="color-bar"></div>
-<form method="POST" action="">
-{% csrf_token %}
-  <div id="note-sheet">
+<div id="note-wrapper">
+	<form method="POST" action="{% url 'web-notes:note-save' %}">
+		{% csrf_token %}
+		<div id="upper-part">
+			<input class="btn btn-info" type="submit" value="Save">
+			<div id="color-bar"></div>
+		</div>
 
-  </div>
+		<div id="note-sheet"></div>
 </form>
 
+
+</div>
 {% endblock %}
 
 
@@ -24,23 +29,25 @@
 var noteSheet = d3.select('#note-sheet')
 let MOUSE = {startX: 0, startY: 0,
 						 endX: 0, endY: 0};
+var xMark = '\u2717';
+var color = 'rgb(255,255,165)';
 
 noteSheet
   .on("mousedown", function() {
-		MOUSE.startY = d3.mouse(this)[1];
-		MOUSE.startX = d3.mouse(this)[0];
+		MOUSE.startY = Math.round(d3.mouse(this)[1]);
+		MOUSE.startX = Math.round(d3.mouse(this)[0]);
 	})
   .on("mouseup", function() {
-		MOUSE.endY = d3.mouse(this)[1];
-		MOUSE.endX = d3.mouse(this)[0];
-		draw();
+		MOUSE.endY = Math.round(d3.mouse(this)[1]);
+		MOUSE.endX = Math.round(d3.mouse(this)[0]);
+		draw(MOUSE.startX, MOUSE.startY, MOUSE.endX, MOUSE.endY, makeId(),color);
 	})
 
 function makeId() {
 	var text = '';
 	var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
-	for(var i = 0; i < 15; i++)
+	for(var i = 0; i < 15 + Math.floor(Math.random() * 5); i++)
 		text += possible.charAt(Math.floor(Math.random() * possible.length));
 
 	return text;
@@ -52,23 +59,22 @@ function removePost(value, object) {
 }
 
 
-function draw() {
-	if(MOUSE.endX - MOUSE.startX < 60 || MOUSE.endY - MOUSE.startY < 80) {
+function draw(sx,sy,ex,ey,postId,color,text) {
+	if(ex - sx < 60 || ey - sy < 80) {
 		return;
 	}
 
-  var width = MOUSE.endX - MOUSE.startX;
-  var height = MOUSE.endY - MOUSE.startY;
+  var width = ex - sx;
+  var height = ey - sy;
 	var postWrapper = noteSheet.append('div')
-															.attr('id', makeId())
+															.attr('id', postId)
 															.attr('class', 'postWrapper')
 	var closerSize = 40;
-	var xMark = '\u2717';
 
 	var postCloser = postWrapper.append('div')
 																.attr('class', 'postCloser')
-																.style('left', MOUSE.startX+'px')
-																.style('top', MOUSE.startY+'px')
+																.style('left', sx+'px')
+																.style('top', sy+'px')
 																.style('width', width+'px')
 																.style('height', closerSize+'px');
 
@@ -81,10 +87,25 @@ function draw() {
 																	
   var textarea = postWrapper.append('textarea')
 															.attr('class', 'note')
-															.style('left', MOUSE.startX+'px')
-															.style('top', MOUSE.startY+closerSize+'px')
+															.attr('name', 'name:' + postId + '::' + color + '::'
+																										+ sx + ',' + sy + ',' + ex + ',' + ey)
+															.style('left', sx+'px')
+															.style('top', Number(sy)+closerSize+'px')
 															.style('width', width+'px')
-															.style('height', height-closerSize+'px')
+															.style('height', Number(height)-closerSize+'px')
+															.style('background-color', color)
+															.text(text)
+
 }
 </script>
+
+<script type="text/javascript">
+{% for post in posts %}
+coords = '{{ post.coordinates }}'.split(',');
+console.log(coords);
+draw(coords[0], coords[1], coords[2], coords[3],
+		 '{{ post.post_id }}', '{{ post.color }}', '{{ post.text }}');
+{% endfor %}
+</script>
+
 {% endblock %}
