@@ -1,23 +1,26 @@
 {% extends 'base/base.html' %}
 
+
+
+
 {% block content %}
 
 <div id="color-bar"></div>
 <form method="POST" action="">
 {% csrf_token %}
-<!--<svg id="note-sheet" class="alert alert-dark">-->
-  <!--<foreignObject x="10" y="10" width="100" height="150">-->
-        <!--<input></input>-->
-  <!--</foreignObject>-->
-<!--</svg>-->
   <div id="note-sheet">
-
 
   </div>
 </form>
 
+{% endblock %}
+
+
+
+
+
+{% block script %}
 <script>
-var rect_count = 0
 var noteSheet = d3.select('#note-sheet')
 let MOUSE = {startX: 0, startY: 0,
 						 endX: 0, endY: 0};
@@ -33,20 +36,55 @@ noteSheet
 		draw();
 	})
 
+function makeId() {
+	var text = '';
+	var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+	for(var i = 0; i < 15; i++)
+		text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+	return text;
+}
+
+function removePost(value, object) {
+	object.parentNode.parentNode.remove();	
+	return false;
+}
+
+
 function draw() {
-	if(MOUSE.endX - MOUSE.startX < 50 || MOUSE.endY - MOUSE.startY < 30) {
+	if(MOUSE.endX - MOUSE.startX < 60 || MOUSE.endY - MOUSE.startY < 80) {
 		return;
 	}
 
   var width = MOUSE.endX - MOUSE.startX;
   var height = MOUSE.endY - MOUSE.startY;
-  console.log('width, height: ',width, height);
-  noteSheet.append('textarea')
-        .attr('class', 'note')
-        .style('left', MOUSE.startX+'px')
-        .style('top', MOUSE.startY+'px')
-        .style('width', width+'px')
-        .style('height', height+'px')
+	var postWrapper = noteSheet.append('div')
+															.attr('id', makeId())
+															.attr('class', 'postWrapper')
+	var closerSize = 40;
+	var xMark = '\u2717';
+
+	var postCloser = postWrapper.append('div')
+																.attr('class', 'postCloser')
+																.style('left', MOUSE.startX+'px')
+																.style('top', MOUSE.startY+'px')
+																.style('width', width+'px')
+																.style('height', closerSize+'px');
+
+	var postCloserButton = postCloser.append('a')
+																		.attr('href', '#')
+																		.attr('onclick', 'removePost("value", this)')
+																		.append('span')
+																		.attr('class', 'postCloserButton')
+																		.text(xMark)
+																	
+  var textarea = postWrapper.append('textarea')
+															.attr('class', 'note')
+															.style('left', MOUSE.startX+'px')
+															.style('top', MOUSE.startY+closerSize+'px')
+															.style('width', width+'px')
+															.style('height', height-closerSize+'px')
 }
 </script>
 {% endblock %}
