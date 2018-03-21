@@ -16,14 +16,23 @@ textarea.note {
     /*background-color: rgb(255,255,165);*/
 }
 
-textarea:active {
+textarea:hover {
 	z-index: 9999;
 }
 
+textarea:hover + div {
+  z-index: 9999;
+}
+
+.postCloser:hover {
+  z-index: 9999;
+}
+
 .postCloser {
-	background-color: rgb(225,225,135);
 	position: absolute;
 }
+
+
 
 span.postCloserButton {
 	/*display: inline-block;*/

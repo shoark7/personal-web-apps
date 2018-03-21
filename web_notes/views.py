@@ -1,5 +1,6 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
+from django.urls import reverse
 from .models import Post
 
 from apis.note_api import parse_post_request
@@ -11,32 +12,30 @@ def notesheet(request):
 
 
 def note_save(request):
-    if request.method == 'POST':
 
-        posts = Post.objects.all()
-        posts_keys = set(Post.objects.all())
-        new_posts = {key: value for key, value in request.POST.items() if (key.startswith('name:') \
-                     and value.strip())}
-        new_posts_keys = set(new_posts)
+    posts = Post.objects.all()
+    posts_keys = {post.post_id for post in Post.objects.all()}
+    new_posts = {key: value for key, value in request.POST.items() if (key.startswith('name:') \
+                 and value.strip())}
+    new_posts_keys = set(new_posts)
 
-        # 1. 새로 생성
-        for new in (new_posts_keys - posts_keys):
-            print(new)
-            post_id, color, coords = parse_post_request(new)
-            Post.objects.create(post_id=post_id,
-                                color=color,
-                                text=new_posts[new],
-                                coordinates=coords,
-                               )
+    # 1. 새로 생성
+    for key in (new_posts_keys - posts_keys):
+        color, coords = parse_post_request(key)
+        Post.objects.create(post_id=key,
+                        color=color,
+                        text=new_posts[key],
+                        coordinates=coords,
+                       )
 
-        # 2. 삭제
-        for d in (posts_keys - new_posts_keys):
-            pass
+    # 2. 삭제
+    for d in (posts_keys - new_posts_keys):
+        Post.objects.get(pk=d).delete()
 
-        # 3. 수정
-        for upd in posts_keys.intersection(new_posts_keys):
-            pass
+    # 3. 수정
+    for key in posts_keys.intersection(new_posts_keys):
+        updated = posts.get(pk=key)
+        updated.text = new_posts[key]
+        updated.save()
 
-
-        return HttpResponse("200 post")
-    return HttpResponse("200 get")
+    return HttpResponseRedirect(reverse('web-notes:note-sheet'))
